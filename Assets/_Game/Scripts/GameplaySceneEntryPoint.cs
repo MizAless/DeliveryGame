@@ -3,6 +3,8 @@
 public class GameplaySceneEntryPoint : MonoBehaviour
 {
     [SerializeField] private Player _playerPrefab;
+    
+    [SerializeField] private Updater _updater;
 
     private Actions _actions;
 
@@ -22,5 +24,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         IMoveInput moveInput = new PlayerInput(_actions);
         PlayerFactory factory = new PlayerFactory(_playerPrefab, moveInput);
         var player = factory.Create();
+        
+        _updater.Register((ITickable)moveInput);
     }
 }

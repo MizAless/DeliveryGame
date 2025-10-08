@@ -21,8 +21,10 @@ public class Mover : MonoBehaviour
             return;
 
         Vector2 moveInput = _moveInput.GetMoveInput();
+        
+        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
 
-        _transform.Translate(moveInput * (_speed * Time.deltaTime));
+        _transform.position += moveDirection * (_speed * Time.deltaTime);
     }
 
     public void Initialize(IMoveInput moveInput)

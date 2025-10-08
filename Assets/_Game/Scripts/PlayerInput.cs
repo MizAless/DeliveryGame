@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerInput : IMoveInput, ITickable
 {
@@ -18,9 +17,4 @@ public class PlayerInput : IMoveInput, ITickable
     }
 
     public Vector2 GetMoveInput() => _moveInput;
-}
-
-public interface IMoveInput
-{
-    Vector2 GetMoveInput();
 }
