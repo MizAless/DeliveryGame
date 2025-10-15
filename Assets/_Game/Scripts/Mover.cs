@@ -7,6 +7,7 @@ public class Mover : MonoBehaviour
 
     private Transform _transform;
     private IMoveInput _moveInput;
+    private IFollowCamera _followCamera;
 
     private bool _isInitialized = false;
 
@@ -21,16 +22,18 @@ public class Mover : MonoBehaviour
             return;
 
         Vector2 moveInput = _moveInput.GetMoveInput();
-        
+
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
+        
 
         _transform.position += moveDirection * (_speed * Time.deltaTime);
     }
 
-    public void Initialize(IMoveInput moveInput)
+    public void Initialize(IMoveInput moveInput, IFollowCamera followCamera)
     {
         _isInitialized = true;
 
         _moveInput = moveInput;
+        _followCamera = followCamera;
     }
 }

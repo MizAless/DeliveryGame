@@ -33,7 +33,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
             HorizontalAngle = 45,
         };
         
-        var followCamera = new FollowCamera(_camera, player.transform, followCameraData);
+        var followCamera = new FollowCameraService(_camera, player.transform, followCameraData);
         
         _updater.Register((ITickable)moveInput);
         _updater.Register(followCamera);
