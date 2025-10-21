@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Zenject;
 
 public class Mover : MonoBehaviour
 {
@@ -9,7 +10,12 @@ public class Mover : MonoBehaviour
     private IMoveInput _moveInput;
     private IFollowCamera _followCamera;
 
-    private bool _isInitialized = false;
+    [Inject]
+    public void Construct(IMoveInput moveInput, IFollowCamera followCamera)
+    {
+        _moveInput = moveInput;
+        _followCamera = followCamera;
+    }
 
     private void Awake()
     {
@@ -18,22 +24,9 @@ public class Mover : MonoBehaviour
 
     private void Update()
     {
-        if (!_isInitialized)
-            return;
-
         Vector2 moveInput = _moveInput.GetMoveInput();
-
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        
 
         _transform.position += moveDirection * (_speed * Time.deltaTime);
-    }
-
-    public void Initialize(IMoveInput moveInput, IFollowCamera followCamera)
-    {
-        _isInitialized = true;
-
-        _moveInput = moveInput;
-        _followCamera = followCamera;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class FollowCameraService : ITickable, IService, IFollowCamera
+public class FollowCamera : ILateTickable, IFollowCamera
 {
     private readonly Camera _camera;
     private readonly Transform _target;
@@ -9,7 +9,7 @@ public class FollowCameraService : ITickable, IService, IFollowCamera
     private float _verticalAngle;
     private float _horizontalAngle;
 
-    public FollowCameraService(Camera camera, Transform target, FollowCameraData data)
+    public FollowCamera(Camera camera, Transform target, FollowCameraData data)
     {
         _camera = camera;
         _target = target;
@@ -21,7 +21,7 @@ public class FollowCameraService : ITickable, IService, IFollowCamera
 
     public float HorizontalAngle => _horizontalAngle;
 
-    public void Tick()
+    public void LateTick()
     {
         Quaternion orbitRotation = Quaternion.Euler(_verticalAngle, _horizontalAngle, 0f);
         
@@ -32,16 +32,4 @@ public class FollowCameraService : ITickable, IService, IFollowCamera
 
         _camera.transform.SetPositionAndRotation(desiredPosition, lookAtTarget);
     }
-}
-
-public interface IFollowCamera
-{
-    float HorizontalAngle { get; } 
-}
-
-public struct FollowCameraData
-{
-    public float Distance;
-    public float VerticalAngle;
-    public float HorizontalAngle;
 }

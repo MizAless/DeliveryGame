@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerInput : IMoveInput, ITickable
+public class PlayerInput : IMoveInput, ITickable, IService
 {
     private readonly Actions _controls;
 

@@ -22,10 +22,11 @@ public class GameplaySceneEntryPoint : MonoBehaviour
 
     private void Start()
     {
+        // ServiceLocator.Init();
+        
         IMoveInput moveInput = new PlayerInput(_actions);
-        PlayerFactory factory = new PlayerFactory(_playerPrefab, moveInput);
-        var player = factory.Create();
-
+        PlayerFactory factory = new PlayerFactory(_playerPrefab);
+        
         var followCameraData = new FollowCameraData()
         {
             Distance = 5,
@@ -33,9 +34,14 @@ public class GameplaySceneEntryPoint : MonoBehaviour
             HorizontalAngle = 45,
         };
         
-        var followCamera = new FollowCameraService(_camera, player.transform, followCameraData);
+        IFollowCamera followCamera = new FollowCamera(_camera, player.transform, followCameraData);
+
+        // ServiceLocator.Register<IMoveInput>((IService)moveInput);
+        // ServiceLocator.Register<IFollowCamera>((IService)followCamera);
+        
+        var player = factory.Create();
         
         _updater.Register((ITickable)moveInput);
-        _updater.Register(followCamera);
+        _updater.Register((ILateTickable)followCamera);
     }
 }
