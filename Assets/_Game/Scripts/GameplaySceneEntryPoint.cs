@@ -44,6 +44,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         horizontalAngleOffset.SetTarget(player.transform);
         
         var mover = player.GetComponent<Mover>();
+        var deliveryMan = player.GetComponent<DeliveryMan>();
         
         mover.Init(moveInput, horizontalAngleOffset);
         

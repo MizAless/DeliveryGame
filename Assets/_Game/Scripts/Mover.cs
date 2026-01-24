@@ -5,6 +5,9 @@ public class Mover : MonoBehaviour, ITickable
     [Header("Вынести в конфиг!!!")] [SerializeField]
     private float _speed = 5f;
 
+    [SerializeField]
+    private float _rotationSpeed = 0.5f;
+
     private Transform _transform;
     private IMoveInput _moveInput;
     private IHorizontalAngleOffset _horizontalAngleOffset;
@@ -27,5 +30,6 @@ public class Mover : MonoBehaviour, ITickable
         moveDirection = Quaternion.Euler(0, _horizontalAngleOffset.HorizontalAngle, 0) * moveDirection;
 
         _transform.position += moveDirection * (_speed * Time.deltaTime);
+        _transform.forward = Vector3.Lerp(_transform.forward, moveDirection, _rotationSpeed * Time.deltaTime);
     }
 }
