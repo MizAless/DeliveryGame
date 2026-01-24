@@ -29,8 +29,8 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         
         var followCameraData = new FollowCameraData()
         {
-            Distance = 5,
-            VerticalAngle = 45,
+            Distance = 12,
+            VerticalAngle = 57,
             HorizontalAngle = 45,
         };
         
