@@ -3,10 +3,15 @@
 public class GameplaySceneEntryPoint : MonoBehaviour
 {
     [SerializeField] private Player _playerPrefab;
-    
     [SerializeField] private Updater _updater;
-
     [SerializeField] private Camera _camera;
+    
+    [SerializeField] private DeliveryObject _deliveryObjectPrefab;
+    [SerializeField] private DeliveryRecipient _deliveryRecipientPrefab;
+    
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private float _spawnDistance;
+    
     private Actions _actions;
 
     private void Awake()
@@ -25,11 +30,14 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         ServiceLocator.Init();
         
         PlayerInput moveInput = new PlayerInput(_actions);
-        PlayerFactory factory = new PlayerFactory(_playerPrefab);
+        PlayerFactory playerFactory = new PlayerFactory(_playerPrefab);
+        
+        DeliveryObjectFactory deliveryObjectFactory = new DeliveryObjectFactory(_deliveryObjectPrefab);
+        DeliveryRecipientFactory deliveryRecipientFactory = new DeliveryRecipientFactory(_deliveryRecipientPrefab);
         
         var followCameraData = new FollowCameraData()
         {
-            Distance = 12,
+            Distance = 8,
             VerticalAngle = 57,
             HorizontalAngle = 45,
         };
@@ -39,17 +47,34 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         ServiceLocator.Register<IMoveInput>(moveInput);
         ServiceLocator.Register<IHorizontalAngleOffset>(horizontalAngleOffset);
         
-        var player = factory.Create();
+        var player = playerFactory.Create();
+        var navigationArrow = player.GetComponentInChildren<NavigationArrow>();
+        
+        NavigationSystem navigationSystem = new NavigationSystem(navigationArrow);
         
         horizontalAngleOffset.SetTarget(player.transform);
         
         var mover = player.GetComponent<Mover>();
         var deliveryMan = player.GetComponent<DeliveryMan>();
+
+        deliveryMan.Init(deliveryObjectFactory);
+        
+        RandomPlacer randomPlacer = new RandomPlacer(_spawnPoint.position, _spawnDistance); 
+        
+        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, randomPlacer);
         
         mover.Init(moveInput, horizontalAngleOffset);
         
+        EventsSystem eventsSystem = new EventsSystem();
+        
         _updater.Register(moveInput);
-        _updater.Register(horizontalAngleOffset);
+        _updater.Register(horizontalAngleOffset as ILateTickable);
+        _updater.Register(horizontalAngleOffset as ITickable);
         _updater.Register(mover);
+        _updater.Register(deliveryMan);
+        _updater.Register(navigationArrow);
+        _updater.Register(deliverySystem);
+        _updater.Register(navigationSystem);
+        _updater.Register(eventsSystem);
     }
 }

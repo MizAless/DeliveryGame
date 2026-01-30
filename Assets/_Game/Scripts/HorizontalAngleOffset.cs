@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class HorizontalAngleOffset : ILateTickable, IHorizontalAngleOffset, IService
+public class HorizontalAngleOffset : ILateTickable, IHorizontalAngleOffset, IService, ITickable
 {
     private readonly Camera _camera;
     
@@ -36,5 +36,26 @@ public class HorizontalAngleOffset : ILateTickable, IHorizontalAngleOffset, ISer
         Quaternion lookAtTarget = Quaternion.LookRotation(_target.position - desiredPosition, Vector3.up);
 
         _camera.transform.SetPositionAndRotation(desiredPosition, lookAtTarget);
+    }
+
+    public void Tick()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+            _verticalAngle += 1;
+        
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+            _verticalAngle += -1;
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            _distance += 0.5f;
+            Debug.Log(_distance);
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            _distance += -0.5f;
+            Debug.Log(_distance);
+        }
     }
 }

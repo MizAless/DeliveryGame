@@ -1,19 +1,4 @@
-﻿using Unity.VisualScripting;
-using UnityEngine;
-
-public class PlayerFactory : IFactory<Player>
+﻿public class PlayerFactory : AbstractFactory<Player>
 {
-    private Player _playerPrefab;
-
-    public PlayerFactory(Player playerPrefab)
-    {
-        _playerPrefab = playerPrefab;
-    }
-
-    public Player Create()
-    {
-        var player  = Object.Instantiate(_playerPrefab);
-
-        return player;
-    }
+    public PlayerFactory(Player prefab) : base(prefab) { }
 }

@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class DeliveryMan : MonoBehaviour, ITickable
 {
     [SerializeField] private float _grabDistance = 1f;
+    [SerializeField] private float _giveDistance = 1f;
     [SerializeField] private float _alreadyGrabbedDistance = 0.05f;
     [SerializeField] private float _grabSpeed = 3f;
     
@@ -11,55 +13,77 @@ public class DeliveryMan : MonoBehaviour, ITickable
     [SerializeField] float _flightTime = 0.7f;
     [SerializeField] float _maxHeight = 2f; 
     [SerializeField] float _smoothness = 1.0f;  
+    
+    private DeliveryObjectFactory _deliveryObjectFactory;
 
     private Transform _transform;
     private DeliveryObject _deliveryObject;
+    private DeliveryRecipient _deliveryRecipient;
     
-    private bool _isGrabbing = false;
+    private enum DeliveryState
+    {
+        Waiting,
+        ToDeliveryObject,
+        Grabbing,
+        ToDeliveryRecipient,
+        Throwing,
+    }
+    
+    private DeliveryState _deliveryState = DeliveryState.Waiting;
+    
+    public event Action<DeliveryObject> GrabStarted;
+    public event Action<DeliveryObject> GrabEnded;
+    public event Action<DeliveryObject> ThrowEnded;
 
     private void Awake()
     {
         _transform = transform;
     }
     
-    public void Init(DeliveryObject deliveryObject)
+    public void Init(DeliveryObjectFactory factory)
     {
+        _deliveryObjectFactory = factory;
+    }
+    
+    public void SetTarget(DeliveryObject deliveryObject)
+    {
+        _deliveryState = DeliveryState.ToDeliveryObject;
         _deliveryObject = deliveryObject;
+        
+        GlobalEvents.Send(new DeliveryManGoingToDeliveryObjectEvent
+        {
+            DeliveryObject = _deliveryObject,
+        });
+    }
+    
+    public void SetTarget(DeliveryRecipient deliveryRecipient)
+    {
+        _deliveryState = DeliveryState.ToDeliveryRecipient;
+        _deliveryRecipient = deliveryRecipient;
+        
+        GlobalEvents.Send(new DeliveryManGoingToDeliveryRecipientEvent()
+        {
+            DeliveryRecipient = _deliveryRecipient,
+        });
     }
 
     public void Tick()
     {
-        if (_deliveryObject == null)
-        {
-            _deliveryObject = FindAnyObjectByType<DeliveryObject>();
+        if (_deliveryState == DeliveryState.Waiting)
             return;
-        }
         
-        if (!_isGrabbing && (_transform.position - _deliveryObject.transform.position).sqrMagnitude < _grabDistance * _grabDistance)
-        {
-            _isGrabbing = true;
-            StartCoroutine(GrabParabolic());
-        }
+        if (_deliveryState == DeliveryState.ToDeliveryObject && 
+            _transform.position.Closer(_deliveryObject.transform.position, _grabDistance))
+            StartCoroutine(Grab());
+
+        if (_deliveryState == DeliveryState.ToDeliveryRecipient &&
+            _transform.position.Closer(_deliveryRecipient.transform.position, _giveDistance))
+            StartCoroutine(Throw());
     }
     
-    private IEnumerator Grab()
+    private IEnumerator MoveParabolic(Transform from, Transform to)
     {
-        while ((_transform.position - _deliveryObject.transform.position).sqrMagnitude >
-               _alreadyGrabbedDistance * _alreadyGrabbedDistance)
-        {
-            _deliveryObject.transform.position = Vector3.Lerp(_deliveryObject.transform.position, _transform.position, _grabSpeed * Time.deltaTime);
-            yield return null;
-        }
-        
-        Destroy(_deliveryObject.gameObject);
-        _deliveryObject = null;
-        
-        _isGrabbing = false;
-    }
-    
-    private IEnumerator GrabParabolic()
-    {
-        Vector3 startPos = _deliveryObject.transform.position;
+        Vector3 startPos = from.position;
         
         float elapsedTime = 0f;
     
@@ -68,7 +92,7 @@ public class DeliveryMan : MonoBehaviour, ITickable
             elapsedTime += Time.deltaTime;
             float normalizedTime = elapsedTime / _flightTime;
             
-            Vector3 endPos = _transform.position;
+            Vector3 endPos = to.position;
         
             Vector3 midPoint = (startPos + endPos) * 0.5f;
             midPoint.y += _maxHeight;
@@ -80,20 +104,49 @@ public class DeliveryMan : MonoBehaviour, ITickable
             Vector3 position = CalculateQuadraticBezierPoint(
                 startPos, 
                 midPoint, 
-                _transform.position, 
+                endPos, 
                 easedTime
             );
         
-            _deliveryObject.transform.position = position;
+            from.position = position;
             yield return null;
         }
     
-        _deliveryObject.transform.position = _transform.position;
+        from.position = to.position;
+        yield return null;
+    }
     
+    private IEnumerator Grab()
+    {
+        _deliveryState = DeliveryState.Grabbing;
+        
+        GrabStarted?.Invoke(_deliveryObject);
+        
+        yield return MoveParabolic(_deliveryObject.transform, _transform);
+    
+        _deliveryState = DeliveryState.ToDeliveryRecipient;
+
+        GrabEnded?.Invoke(_deliveryObject);
         Destroy(_deliveryObject.gameObject);
         _deliveryObject = null;
+    }
+    
+    private IEnumerator Throw()
+    {
+        _deliveryState = DeliveryState.Throwing;
         
-        _isGrabbing = false;
+        _deliveryObject = _deliveryObjectFactory.Create();
+        
+        _deliveryObject.transform.position = _transform.position;
+        
+        yield return MoveParabolic(_deliveryObject.transform, _deliveryRecipient.transform);
+        
+        _deliveryState = DeliveryState.Waiting;
+        
+        ThrowEnded?.Invoke(_deliveryObject);
+        
+        Destroy(_deliveryObject.gameObject);
+        _deliveryObject = null;
     }
 
     private Vector3 CalculateQuadraticBezierPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
@@ -116,6 +169,19 @@ public class DeliveryMan : MonoBehaviour, ITickable
         color.a = 0.3f;
         
         Gizmos.color = color;
-        Gizmos.DrawSphere(transform.position, _grabDistance);
+        Gizmos.DrawSphere(transform.position, _giveDistance);
+    }
+}
+
+public static class Vector3Extensions
+{
+    public static float SqrtDistance(this Vector3 position, Vector3 other)
+    {
+        return (other - position).sqrMagnitude;
+    }
+    
+    public static bool Closer(this Vector3 position, Vector3 other, float distance)
+    {
+        return position.SqrtDistance(other) < distance;
     }
 }

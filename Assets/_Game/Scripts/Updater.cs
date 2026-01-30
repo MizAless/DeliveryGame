@@ -14,6 +14,13 @@ public class Updater : MonoBehaviour
     {
         _lateTickables.Add(lateTickable);
     }
+    
+    // public void Register(ISomeTickable someTickable)
+    // {
+    //     if (someTickable is ILateTickable)
+    //         _lateTickables.Add();
+    //         
+    // }
 
     private void Update()
     {
