@@ -17,10 +17,10 @@ public class RoadSide
 
 public class ChunkView : MonoBehaviour
 {
-    private const float MainSideLength = 10f;
-    private const float RoadSideWidth = 3f;
+    public static float MainSideLength = 10f;
+    public static float RoadSideWidth = 3f;
     
-    public static float ChunkOffset = (MainSideLength + RoadSideWidth);
+    public static float ChunkOffset => MainSideLength + RoadSideWidth;
     
     [SerializeField] private GameObject _roadPrefab;
     [SerializeField] private GameObject _main;

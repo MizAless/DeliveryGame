@@ -7,7 +7,9 @@ public class ChunkSceneEntryPoint : MonoBehaviour
 
     private void Start()
     {
-        var mapGenerator = new MapGenerator(_chunkCount, _chunkPrefab);
+        var mapContainer = new MapContainer();
+        
+        var mapGenerator = new MapGenerator(_chunkCount, _chunkPrefab, mapContainer);
         
         mapGenerator.Generate();
     }

@@ -8,33 +8,32 @@ public class MapGenerator
 {
     private ChunkView _chunkPrefab; 
     
-    private Dictionary<Vector2, ChunkView.Sides> _directions = new Dictionary<Vector2, ChunkView.Sides>()
+    private Dictionary<Vector2Int, ChunkView.Sides> _directions = new Dictionary<Vector2Int, ChunkView.Sides>()
     {
-        { Vector2.up, ChunkView.Sides.up },
-        { Vector2.down, ChunkView.Sides.down },
-        { Vector2.left, ChunkView.Sides.left },
-        { Vector2.right, ChunkView.Sides.right },
+        { Vector2Int.up, ChunkView.Sides.up },
+        { Vector2Int.down, ChunkView.Sides.down },
+        { Vector2Int.left, ChunkView.Sides.left },
+        { Vector2Int.right, ChunkView.Sides.right },
     };
     
-    List<ChunkData> _chunks = new List<ChunkData>();
-    
-    
+    MapContainer _mapContainer;
     
     private int _chunkCount;
     private float _biasToCenter = 1f; // коэффициент влияния расстояния (можно настраивать)
 
-    public MapGenerator(int chunkCount, ChunkView chunkPrefab)
+    public MapGenerator(int chunkCount, ChunkView chunkPrefab, MapContainer mapContainer)
     {
         _chunkCount = chunkCount;
         _chunkPrefab = chunkPrefab;
+        _mapContainer = mapContainer;
     }
 
     public void Generate()
     {
-        _chunks.Clear();
+        _mapContainer.Clear();
         
-        Vector2 currentPosition = Vector2.zero;
-        Vector2 previousDirection = Vector2.zero;
+        Vector2Int currentPosition = Vector2Int.zero;
+        Vector2Int previousDirection = Vector2Int.zero;
 
         var startChunk = new ChunkData()
         {
@@ -44,7 +43,7 @@ public class MapGenerator
 
         InitChunkSides(startChunk);
         
-        _chunks.Add(startChunk);
+        _mapContainer.Add(startChunk);
         
         for (int i = 0; i < _chunkCount - 1; i++)
         {
@@ -60,10 +59,10 @@ public class MapGenerator
             
             previousDirection = randomDirection;
             InitChunkSides(newChunk);
-            _chunks.Add(newChunk);
+            _mapContainer.Add(newChunk);
         }
 
-        foreach (var chunk in _chunks)
+        foreach (var chunk in _mapContainer.Chunks)
         {
             var position = new Vector3(chunk.Position.x, 0, chunk.Position.y) * ChunkView.ChunkOffset;
             var chunkView = Object.Instantiate(_chunkPrefab, position, Quaternion.identity);
@@ -85,7 +84,7 @@ public class MapGenerator
         chunkData.ActiveSides = activeSides;
     }
 
-    private Vector2 GetRandomDirection(Vector2 currentPos, Vector2 previousDir)
+    private Vector2Int GetRandomDirection(Vector2Int currentPos, Vector2Int previousDir)
     {
         // Собираем все возможные направления
         var possibleDirs = _directions.Keys.ToList();
@@ -100,13 +99,13 @@ public class MapGenerator
             possibleDirs = _directions.Keys.ToList();
 
         // Отдельно соберём свободные направления (ведущие на пустые клетки)
-        var freeDirs = new List<Vector2>();
-        var occupiedDirs = new List<Vector2>();
+        var freeDirs = new List<Vector2Int>();
+        var occupiedDirs = new List<Vector2Int>();
         
         foreach (var dir in possibleDirs)
         {
             var newPos = currentPos + dir;
-            if (_chunks.Any(c => c.Position == newPos))
+            if (_mapContainer.Chunks.Any(c => c.Position == newPos))
                 occupiedDirs.Add(dir);
             else
                 freeDirs.Add(dir);
@@ -151,7 +150,7 @@ public class ChunkData
 {
     private ChunkView.Sides _activeSides;
 
-    public Vector2 Position;
+    public Vector2Int Position;
     public ChunkView.Sides ActiveSides
     {
         get => _activeSides;

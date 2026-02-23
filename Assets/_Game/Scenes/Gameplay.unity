@@ -260,6 +260,8 @@ MonoBehaviour:
   _deliveryRecipientPrefab: {fileID: 8335974677461396914, guid: 658f350e832a2e746ba2b374d41275bf, type: 3}
   _spawnPoint: {fileID: 1747620375}
   _spawnDistance: 5
+  _startChunkCount: 3
+  _chunkPrefab: {fileID: 2871691479721051994, guid: c79d52db2624b2642a2307dda9e2878d, type: 3}
 --- !u!4 &213770404
 Transform:
   m_ObjectHideFlags: 0
@@ -894,10 +896,10 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 213770404}
   - {fileID: 913011229}
   - {fileID: 445816030}
   - {fileID: 1507310894}
-  - {fileID: 213770404}
   - {fileID: 1534275556}
   - {fileID: 212840426}
   - {fileID: 1471001068}

@@ -11,11 +11,13 @@ public class Mover : MonoBehaviour, ITickable
     private Transform _transform;
     private IMoveInput _moveInput;
     private IHorizontalAngleOffset _horizontalAngleOffset;
+    private MapBounds _mapBounds;
 
-    public void Init(IMoveInput moveInput, IHorizontalAngleOffset horizontalAngleOffset)
+    public void Init(IMoveInput moveInput, IHorizontalAngleOffset horizontalAngleOffset, MapBounds mapBounds)
     {
         _moveInput = moveInput;
         _horizontalAngleOffset = horizontalAngleOffset;
+        _mapBounds = mapBounds;
     }
 
     private void Awake()
@@ -29,7 +31,12 @@ public class Mover : MonoBehaviour, ITickable
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
         moveDirection = Quaternion.Euler(0, _horizontalAngleOffset.HorizontalAngle, 0) * moveDirection;
 
-        _transform.position += moveDirection * (_speed * Time.deltaTime);
+        var nextPosition = _transform.position + moveDirection * (_speed * Time.deltaTime);
+        
+        if (!_mapBounds.IsAllowToMove(nextPosition))
+            return;
+
+        _transform.position = nextPosition;
         _transform.forward = Vector3.Lerp(_transform.forward, moveDirection, _rotationSpeed * Time.deltaTime);
     }
 }
