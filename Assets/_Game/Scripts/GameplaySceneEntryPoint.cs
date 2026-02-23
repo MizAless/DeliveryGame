@@ -11,6 +11,9 @@ public class GameplaySceneEntryPoint : MonoBehaviour
     
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private float _spawnDistance;
+
+    [SerializeField] private int _startChunkCount;
+    [SerializeField] private ChunkView _chunkPrefab;
     
     private Actions _actions;
 
@@ -28,6 +31,9 @@ public class GameplaySceneEntryPoint : MonoBehaviour
     private void Start()
     {
         ServiceLocator.Init();
+
+        MapGenerator mapGenerator = new MapGenerator(_startChunkCount, _chunkPrefab);
+        mapGenerator.Generate();
         
         PlayerInput moveInput = new PlayerInput(_actions);
         PlayerFactory playerFactory = new PlayerFactory(_playerPrefab);

@@ -18,6 +18,8 @@ public class MapGenerator
     
     List<ChunkData> _chunks = new List<ChunkData>();
     
+    
+    
     private int _chunkCount;
     private float _biasToCenter = 1f; // коэффициент влияния расстояния (можно настраивать)
 
