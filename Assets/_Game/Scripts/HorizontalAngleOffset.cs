@@ -14,9 +14,9 @@ public class HorizontalAngleOffset : ILateTickable, IHorizontalAngleOffset, ISer
     {
         _camera = camera;
 
-        _distance       = data.Distance;
-        _verticalAngle  = data.VerticalAngle;  
-        _horizontalAngle= data.HorizontalAngle;
+        _distance        = data.Distance;
+        _verticalAngle   = data.VerticalAngle;  
+        _horizontalAngle = data.HorizontalAngle;
     }
 
     public float HorizontalAngle => _horizontalAngle;

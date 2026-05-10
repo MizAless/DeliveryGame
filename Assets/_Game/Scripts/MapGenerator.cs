@@ -10,10 +10,10 @@ public class MapGenerator
     
     private Dictionary<Vector2Int, ChunkView.Sides> _directions = new Dictionary<Vector2Int, ChunkView.Sides>()
     {
-        { Vector2Int.up, ChunkView.Sides.up },
-        { Vector2Int.down, ChunkView.Sides.down },
-        { Vector2Int.left, ChunkView.Sides.left },
-        { Vector2Int.right, ChunkView.Sides.right },
+        { Vector2Int.up, ChunkView.Sides.Up },
+        { Vector2Int.down, ChunkView.Sides.Down },
+        { Vector2Int.left, ChunkView.Sides.Left },
+        { Vector2Int.right, ChunkView.Sides.Right },
     };
     
     MapContainer _mapContainer;
@@ -38,7 +38,7 @@ public class MapGenerator
         var startChunk = new ChunkData()
         {
             Position = currentPosition,
-            ActiveSides = ChunkView.Sides.none,
+            ActiveSides = ChunkView.Sides.None,
         };
 
         InitChunkSides(startChunk);
@@ -54,7 +54,7 @@ public class MapGenerator
             var newChunk = new ChunkData()
             {
                 Position = currentPosition,
-                ActiveSides = ChunkView.Sides.none,
+                ActiveSides = ChunkView.Sides.None,
             };
             
             previousDirection = randomDirection;
@@ -66,13 +66,13 @@ public class MapGenerator
         {
             var position = new Vector3(chunk.Position.x, 0, chunk.Position.y) * ChunkView.ChunkOffset;
             var chunkView = Object.Instantiate(_chunkPrefab, position, Quaternion.identity);
-            chunkView.BindData(chunk);
+            chunkView.Init(chunk);
         }
     }
     
     private void InitChunkSides(ChunkData chunkData)
     {
-        var activeSides = ChunkView.Sides.down | ChunkView.Sides.up | ChunkView.Sides.left | ChunkView.Sides.right;
+        var activeSides = ChunkView.Sides.Down | ChunkView.Sides.Up | ChunkView.Sides.Left | ChunkView.Sides.Right;
         
         // foreach (var direction in _directions.Keys)
         // {
@@ -160,6 +160,8 @@ public class ChunkData
             ActiveSidesChanged?.Invoke(value);
         }
     }
+
+    public SpawnPointsContainer SpawnPointsContainer;
 
     public event Action<ChunkView.Sides> ActiveSidesChanged; 
 }

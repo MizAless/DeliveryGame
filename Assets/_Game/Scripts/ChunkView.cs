@@ -21,14 +21,12 @@ public class ChunkView : MonoBehaviour
     public static float RoadSideWidth = 3f;
     
     public static float ChunkOffset => MainSideLength + RoadSideWidth;
-    
+
+    [SerializeField] private SpawnPointsContainer _spawnPointsContainer;
     [SerializeField] private GameObject _roadPrefab;
     [SerializeField] private GameObject _main;
 
     [SerializeField] private List<GameObject> _randomSidesParents;
-    // [SerializeField] private List<GameObject> _roads = new List<GameObject>();
-    // private Dictionary<Sides, GameObject> _roadsDict = new Dictionary<Sides, GameObject>();
-    
     [SerializeField] private List<RoadSide> _roads = new List<RoadSide>();
     
     private ChunkData _chunkData;
@@ -38,17 +36,17 @@ public class ChunkView : MonoBehaviour
     [Flags]
     public enum Sides
     {
-        none = 0,
-        up = 1,
-        down = 2,
-        left = 4,
-        right = 8
+        None = 0,
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8
     }
     
     [ContextMenu(nameof(EnableAllRoads))]
     private void EnableAllRoads()
     {
-        ActiveSides = Sides.up | Sides.down | Sides.left | Sides.right;
+        ActiveSides = Sides.Up | Sides.Down | Sides.Left | Sides.Right;
 
         InitRoads();
     }
@@ -61,10 +59,10 @@ public class ChunkView : MonoBehaviour
         var halfRoadLength = RoadSideWidth * 0.5f;
         var halfMainLength = MainSideLength * 0.5f;
         
-        _roads.Add(new RoadSide( Sides.down,Instantiate(_roadPrefab, mainPosition + new Vector3(-halfMainLength - halfRoadLength, 0, 0), Quaternion.identity)));
-        _roads.Add(new RoadSide( Sides.up,Instantiate(_roadPrefab, mainPosition + new Vector3(halfMainLength + halfRoadLength, 0, 0), Quaternion.identity)));
-        _roads.Add(new RoadSide( Sides.left,Instantiate(_roadPrefab, mainPosition + new Vector3(0, 0, -halfMainLength - halfRoadLength), Quaternion.Euler(0, 90,0))));
-        _roads.Add(new RoadSide( Sides.right,Instantiate(_roadPrefab, mainPosition + new Vector3(0, 0, halfMainLength + halfRoadLength), Quaternion.Euler(0, 90,0))));
+        _roads.Add(new RoadSide( Sides.Down,Instantiate(_roadPrefab, mainPosition + new Vector3(-halfMainLength - halfRoadLength, 0, 0), Quaternion.identity)));
+        _roads.Add(new RoadSide( Sides.Up,Instantiate(_roadPrefab, mainPosition + new Vector3(halfMainLength + halfRoadLength, 0, 0), Quaternion.identity)));
+        _roads.Add(new RoadSide( Sides.Left,Instantiate(_roadPrefab, mainPosition + new Vector3(0, 0, -halfMainLength - halfRoadLength), Quaternion.Euler(0, 90,0))));
+        _roads.Add(new RoadSide( Sides.Right,Instantiate(_roadPrefab, mainPosition + new Vector3(0, 0, halfMainLength + halfRoadLength), Quaternion.Euler(0, 90,0))));
 
         foreach (var road in _roads)
         {
@@ -73,23 +71,11 @@ public class ChunkView : MonoBehaviour
         }
     }
     
-    // [ContextMenu(nameof(Init))]
-    // public void Init()
-    // {
-    //     if (Enum.GetValues(typeof(Sides)).Length != _roads.Count)
-    //         Debug.LogError($"[CHUNK] Enum.GetValues(typeof(Sides)).Length != _roads.Count");
-    //
-    //     var arr = Enum.GetValues(typeof(Sides));
-    //     
-    //     for (int i = 0; i < arr.Length; i++)
-    //     {
-    //         _roadsDict[(Sides)arr.GetValue(i)] = _roads[i];
-    //     }
-    // }
-
-    public void BindData(ChunkData chunkData)
+    public void Init(ChunkData chunkData)
     {
+        chunkData.SpawnPointsContainer = _spawnPointsContainer;
         _chunkData = chunkData;
+        
         OnActiveSidesChanged(_chunkData.ActiveSides);
         SetRandomObjects();
         _chunkData.ActiveSidesChanged += OnActiveSidesChanged;

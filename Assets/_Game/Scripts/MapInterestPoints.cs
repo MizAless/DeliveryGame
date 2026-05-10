@@ -1,25 +1,40 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class MapInterestPoints
 {
-    MapContainer _mapContainer;
+    private MapContainer _mapContainer;
+    
+    private List<ChunkData> _availableChunkPool = new List<ChunkData>();
 
     public MapInterestPoints(MapContainer mapContainer)
     {
         _mapContainer = mapContainer;
+        ResetPool();
     }
 
-    public Vector3 GetRandomNPCSpawnPoint()
+    public Vector3 GetRandomDeliveryLootPoint()
     {
-        var randomIndex = Random.Range(0, _mapContainer.Chunks.Count);
+        var chunk = GetRandomChunk();
+        _availableChunkPool.Remove(chunk);
+        return chunk.SpawnPointsContainer.GetRandomDeliveryLootPoint();
+    }
 
-        return _mapContainer.Chunks[randomIndex].GetComponent<SpawnPointsContainer>().DeliveryLootPoint.position;
+    public Vector3 GetRandomNpcSpawnPoint()
+    {
+        var point = GetRandomChunk().SpawnPointsContainer.GetRandomNPCSpawnPoint();
+        ResetPool();
+        return point;
+    }
+
+    private ChunkData GetRandomChunk()
+    {
+        return _availableChunkPool[Random.Range(0, _availableChunkPool.Count)];
     }
     
-    public Vector3 GetRandomNPCSpawnPoint()
+    private void ResetPool()
     {
-        var randomIndex = Random.Range(0, _mapContainer.Chunks.Count);
-
-        return _mapContainer.Chunks[randomIndex].GetComponent<SpawnPointsContainer>().NpcPoint.position;
+        _availableChunkPool = new List<ChunkData>();
+        _availableChunkPool.AddRange(_mapContainer.Chunks);
     }
 }

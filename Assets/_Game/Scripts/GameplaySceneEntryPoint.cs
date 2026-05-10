@@ -37,7 +37,8 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         
         MapGenerator mapGenerator = new MapGenerator(_startChunkCount, _chunkPrefab, mapContainer);
         mapGenerator.Generate();
-        
+
+        MapInterestPoints mapInterestPoints = new MapInterestPoints(mapContainer);
         
         PlayerInput moveInput = new PlayerInput(_actions);
         PlayerFactory playerFactory = new PlayerFactory(_playerPrefab);
@@ -71,7 +72,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         
         RandomPlacer randomPlacer = new RandomPlacer(_spawnPoint.position, _spawnDistance); 
         
-        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, randomPlacer);
+        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, mapInterestPoints, horizontalAngleOffset);
         
         mover.Init(moveInput, horizontalAngleOffset, mapBounds);
         

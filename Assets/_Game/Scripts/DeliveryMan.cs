@@ -97,10 +97,8 @@ public class DeliveryMan : MonoBehaviour, ITickable
             Vector3 midPoint = (startPos + endPos) * 0.5f;
             midPoint.y += _maxHeight;
         
-            // Применяем easing для гладкости
             float easedTime = Mathf.SmoothStep(0f, 1f, Mathf.Pow(normalizedTime, 1f / _smoothness));
         
-            // Квадратичная интерполяция по Безье для параболы
             Vector3 position = CalculateQuadraticBezierPoint(
                 startPos, 
                 midPoint, 
