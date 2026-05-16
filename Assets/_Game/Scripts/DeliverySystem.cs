@@ -11,18 +11,20 @@ public class DeliverySystem : ITickable
     
     private IHorizontalAngleOffset _horizontalAngleOffset;
 
-    // private RandomPlacer _randomPlacer;
     private MapInterestPoints _mapInterestPoints;
+
+    private DeliveryTaskBuilder _deliveryTaskBuilder;
     
     private bool _deliveryIsExists;
 
-    public DeliverySystem(DeliveryMan deliveryMan, DeliveryObjectFactory deliveryObjectFactory, DeliveryRecipientFactory deliveryRecipientFactory, MapInterestPoints mapInterestPoints, IHorizontalAngleOffset horizontalAngleOffset)
+    public DeliverySystem(DeliveryMan deliveryMan, DeliveryObjectFactory deliveryObjectFactory, DeliveryRecipientFactory deliveryRecipientFactory, MapInterestPoints mapInterestPoints, IHorizontalAngleOffset horizontalAngleOffset, DeliveryTaskBuilder deliveryTaskBuilder)
     {
         _deliveryMan = deliveryMan;
         _deliveryObjectFactory = deliveryObjectFactory;
         _deliveryRecipientFactory = deliveryRecipientFactory;
         _mapInterestPoints = mapInterestPoints;
         _horizontalAngleOffset = horizontalAngleOffset;
+        _deliveryTaskBuilder = deliveryTaskBuilder;
     }
 
     public void Tick()
@@ -34,34 +36,31 @@ public class DeliverySystem : ITickable
     {
         if (_deliveryIsExists)
             return;
-        
+
         _deliveryIsExists = true;
-        
-        _deliveryObject = _deliveryObjectFactory.Create();
-        _deliveryObject.transform.position = _mapInterestPoints.GetRandomDeliveryLootPoint();
-        _deliveryMan.SetTarget(_deliveryObject);
-        _deliveryMan.GrabEnded += OnGrabEnded;
 
-        _deliveryRecipient = _deliveryRecipientFactory.Create();
-        _deliveryRecipient.Init(_horizontalAngleOffset);
-        _deliveryRecipient.transform.position = _mapInterestPoints.GetRandomNpcSpawnPoint();
-        _deliveryMan.ThrowEnded += OnThrowEnded;
-    }
+        DeliveryObjectModel deliveryObject = new DeliveryObjectModel()
+        {
+            SpawnPosition = _mapInterestPoints.GetRandomDeliveryLootPoint()
+        };
 
-    private void OnGrabEnded(DeliveryObject obj)
-    {
-        _deliveryMan.GrabEnded -= OnGrabEnded;
-        
-        _deliveryMan.SetTarget(_deliveryRecipient);
-    }
+        DeliveryRecipientModel deliveryRecipient = new DeliveryRecipientModel()
+        {
+            SpawnPosition = _mapInterestPoints.GetRandomRecipientSpawnPoint()
+        };
 
-    private void OnThrowEnded(DeliveryObject obj)
-    {
-        _deliveryMan.ThrowEnded -= OnThrowEnded;
+        DeliveryTask deliveryTask = new DeliveryTask()
+        {
+            DeliveryObjectModel = deliveryObject,
+            RecipientModel = deliveryRecipient,
+        };
+
+        // TODO: После завершения квеста доставки нужно сообщить, что он был выполнен.
+        // Возможно отправлять сигнал/ивент об этом
         
-        Object.Destroy(_deliveryRecipient.gameObject);
-        _deliveryRecipient = null;
-        
-        _deliveryIsExists = false;
+        UIManager.Instance.InstantiateOffer(deliveryTask, () =>
+        {
+            _deliveryTaskBuilder.Build(deliveryTask);
+        });
     }
 }

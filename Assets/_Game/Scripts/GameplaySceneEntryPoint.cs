@@ -70,9 +70,9 @@ public class GameplaySceneEntryPoint : MonoBehaviour
 
         deliveryMan.Init(deliveryObjectFactory);
         
-        RandomPlacer randomPlacer = new RandomPlacer(_spawnPoint.position, _spawnDistance); 
+        DeliveryTaskBuilder deliveryTaskBuilder = new DeliveryTaskBuilder(deliveryObjectFactory, deliveryRecipientFactory, horizontalAngleOffset, deliveryMan);
         
-        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, mapInterestPoints, horizontalAngleOffset);
+        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, mapInterestPoints, horizontalAngleOffset, deliveryTaskBuilder);
         
         mover.Init(moveInput, horizontalAngleOffset, mapBounds);
         

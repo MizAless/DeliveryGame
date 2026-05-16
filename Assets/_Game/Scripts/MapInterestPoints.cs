@@ -20,7 +20,7 @@ public class MapInterestPoints
         return chunk.SpawnPointsContainer.GetRandomDeliveryLootPoint();
     }
 
-    public Vector3 GetRandomNpcSpawnPoint()
+    public Vector3 GetRandomRecipientSpawnPoint()
     {
         var point = GetRandomChunk().SpawnPointsContainer.GetRandomNPCSpawnPoint();
         ResetPool();
