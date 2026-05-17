@@ -51,11 +51,6 @@ public abstract class BaseUIElement : MonoBehaviour
     
     protected abstract void OnShow();
     protected abstract void OnClose();
-
-    private void OnEnable()
-    {
-        OnShow();
-    }
     
     protected void ShowFromRight() => AnimateFromDirection(Direction.Right, AnimationType.Show);
     protected void ShowFromLeft() => AnimateFromDirection(Direction.Left, AnimationType.Show);
