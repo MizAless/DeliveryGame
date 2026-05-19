@@ -4,8 +4,8 @@ using DG.Tweening;
 
 public abstract class BaseUIElement : MonoBehaviour
 {
-    [SerializeField] private Image _backgroundImage;
-    [SerializeField] private Image _borderImage;
+    [SerializeField] protected Image _backgroundImage;
+    [SerializeField] protected Image _borderImage;
 
     private int pixelOffsetForAnimation = 1000;
     private RectTransform _rectTransform;

@@ -24,7 +24,7 @@ public class DeliveryTaskBuilder
         _currentTask = deliveryTask;
         
         var deliveryObject = _deliveryObjectFactory.Create();
-        deliveryObject.transform.position = deliveryTask.DeliveryObjectModel.SpawnPosition;
+        deliveryObject.transform.position = deliveryTask.DeliveryPackageModel.SpawnPosition;
         _deliveryMan.SetTarget(deliveryObject);
         _deliveryMan.GrabEnded += OnGrabEnded;
 
@@ -34,10 +34,11 @@ public class DeliveryTaskBuilder
         _deliveryMan.ThrowEnded += OnThrowEnded;
     }
 
-    private void OnGrabEnded(DeliveryPackage obj)
+    private void OnGrabEnded(DeliveryPackage deliveryPackage)
     {
         _deliveryMan.GrabEnded -= OnGrabEnded;
         
+        _currentTask.SetGiveState();
         _deliveryMan.SetTarget(_currentDeliveryRecipient);
     }
 

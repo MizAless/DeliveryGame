@@ -5,29 +5,41 @@ using UnityEngine;
 public class DeliveryTask : ITickable
 {
     public DeliveryRecipientModel RecipientModel;
-    public DeliveryObjectModel DeliveryObjectModel;
+    public DeliveryPackageModel DeliveryPackageModel;
     public ITaskReward TaskReward;
     public float ExpiredDuration;
     
     public event Action<DeliveryTask> Cancelled;
     public event Action<DeliveryTask> Completed;
+    public event Action<TaskState> StateChanged;
 
     private DateTime _expirationTime;
 
-    private State _state;
+    private TaskState _state;
 
-    private enum State
+    public TaskState State
     {
-        Created,
+        get => _state;
+        set
+        {
+            _state = value;
+            StateChanged?.Invoke(State);
+        }
+    }
+
+    public enum TaskState
+    {
         WaitingForAccept,
         InProgress,
+        GrabPackage,
+        GivePackage,
         Completed,
         Cancelled,
-    }    
+    }
     
     public void Tick()
     {
-        if (_state != State.WaitingForAccept)
+        if (State != TaskState.WaitingForAccept)
             return;
 
         if (_expirationTime < DateTime.Now)
@@ -37,17 +49,23 @@ public class DeliveryTask : ITickable
     public void Offer()
     {
         _expirationTime = DateTime.Now + TimeSpan.FromSeconds(ExpiredDuration); 
-        _state = State.WaitingForAccept;
+        State = TaskState.WaitingForAccept;
     }
     
     public void Accept()
     {
-        _state = State.InProgress;
+        State = TaskState.InProgress;
+        State = TaskState.GrabPackage;
+    }
+    
+    public void SetGiveState()
+    {
+        State = TaskState.GivePackage;
     }
 
     public void Complete()
     {
-        _state = State.Completed;
+        State = TaskState.Completed;
         Completed?.Invoke(this);
         
         GlobalEvents.Send(new DeliveryTaskCompletedEvent()
@@ -58,7 +76,7 @@ public class DeliveryTask : ITickable
     
     private void Cancel()
     {
-        _state = State.Cancelled;
+        State = TaskState.Cancelled;
         Cancelled?.Invoke(this);
         
         GlobalEvents.Send(new DeliveryTaskCanceledEvent()
@@ -72,7 +90,7 @@ public class DeliveryTask : ITickable
         return new DeliveryTask()
         {
             RecipientModel = RecipientModel,
-            DeliveryObjectModel = DeliveryObjectModel,
+            DeliveryPackageModel = DeliveryPackageModel,
             TaskReward = TaskReward,
         };
     }
@@ -83,7 +101,7 @@ public class DeliveryRecipientModel
     public Vector3 SpawnPosition; 
 }
 
-public class DeliveryObjectModel
+public class DeliveryPackageModel
 {
     public Vector3 SpawnPosition; 
 }

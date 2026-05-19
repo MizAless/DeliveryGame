@@ -57,7 +57,7 @@ public class DeliverySystem : ITickable
         
         _state = State.HasDelivery;
 
-        DeliveryObjectModel deliveryObject = new DeliveryObjectModel()
+        DeliveryPackageModel deliveryPackage = new DeliveryPackageModel()
         {
             SpawnPosition = _mapInterestPoints.GetRandomDeliveryLootPoint()
         };
@@ -69,7 +69,7 @@ public class DeliverySystem : ITickable
 
         DeliveryTask deliveryTask = new DeliveryTask()
         {
-            DeliveryObjectModel = deliveryObject,
+            DeliveryPackageModel = deliveryPackage,
             RecipientModel = deliveryRecipient,
             ExpiredDuration = Random.Range(2f, 5f),
         };
@@ -86,10 +86,15 @@ public class DeliverySystem : ITickable
         
         UIManager.Instance.InstantiateOffer(deliveryTask, () =>
         {
-            deliveryTask.Accept();
-            UIManager.Instance.InstantiateActiveTask(deliveryTask);
-            _deliveryTaskBuilder.Build(deliveryTask);
+            OnAcceptDeliveryTask(deliveryTask);
         });
+    }
+
+    private void OnAcceptDeliveryTask(DeliveryTask deliveryTask)
+    {
+        UIManager.Instance.InstantiateActiveTask(deliveryTask);
+        deliveryTask.Accept();
+        _deliveryTaskBuilder.Build(deliveryTask);
     }
 
     private void OnDeliveryTaskCancelled(DeliveryTask deliveryTask)
