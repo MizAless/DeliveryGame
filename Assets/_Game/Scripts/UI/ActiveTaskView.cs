@@ -16,6 +16,10 @@ public class ActiveTaskView : BaseUIElement
 
     protected override void OnClose()
     {
-        throw new System.NotImplementedException();
+        HideToLeft();
+    }
+
+    public void Init(DeliveryTask deliveryTask)
+    {
     }
 }

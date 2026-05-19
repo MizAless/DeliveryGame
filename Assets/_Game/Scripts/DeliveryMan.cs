@@ -17,7 +17,7 @@ public class DeliveryMan : MonoBehaviour, ITickable
     private DeliveryObjectFactory _deliveryObjectFactory;
 
     private Transform _transform;
-    private DeliveryObject _deliveryObject;
+    private DeliveryPackage _deliveryPackage;
     private DeliveryRecipient _deliveryRecipient;
     
     private enum DeliveryState
@@ -31,9 +31,9 @@ public class DeliveryMan : MonoBehaviour, ITickable
     
     private DeliveryState _deliveryState = DeliveryState.Waiting;
     
-    public event Action<DeliveryObject> GrabStarted;
-    public event Action<DeliveryObject> GrabEnded;
-    public event Action<DeliveryObject> ThrowEnded;
+    public event Action<DeliveryPackage> GrabStarted;
+    public event Action<DeliveryPackage> GrabEnded;
+    public event Action<DeliveryPackage> ThrowEnded;
 
     private void Awake()
     {
@@ -45,14 +45,14 @@ public class DeliveryMan : MonoBehaviour, ITickable
         _deliveryObjectFactory = factory;
     }
     
-    public void SetTarget(DeliveryObject deliveryObject)
+    public void SetTarget(DeliveryPackage deliveryPackage)
     {
         _deliveryState = DeliveryState.ToDeliveryObject;
-        _deliveryObject = deliveryObject;
+        _deliveryPackage = deliveryPackage;
         
-        GlobalEvents.Send(new DeliveryManGoingToDeliveryObjectEvent
+        GlobalEvents.Send(new DeliveryManGoingToDeliveryPackageEvent
         {
-            DeliveryObject = _deliveryObject,
+            DeliveryPackage = _deliveryPackage,
         });
     }
     
@@ -73,7 +73,7 @@ public class DeliveryMan : MonoBehaviour, ITickable
             return;
         
         if (_deliveryState == DeliveryState.ToDeliveryObject && 
-            _transform.position.Closer(_deliveryObject.transform.position, _grabDistance))
+            _transform.position.Closer(_deliveryPackage.transform.position, _grabDistance))
             StartCoroutine(Grab());
 
         if (_deliveryState == DeliveryState.ToDeliveryRecipient &&
@@ -118,33 +118,33 @@ public class DeliveryMan : MonoBehaviour, ITickable
     {
         _deliveryState = DeliveryState.Grabbing;
         
-        GrabStarted?.Invoke(_deliveryObject);
+        GrabStarted?.Invoke(_deliveryPackage);
         
-        yield return MoveParabolic(_deliveryObject.transform, _transform);
+        yield return MoveParabolic(_deliveryPackage.transform, _transform);
     
         _deliveryState = DeliveryState.ToDeliveryRecipient;
 
-        GrabEnded?.Invoke(_deliveryObject);
-        Destroy(_deliveryObject.gameObject);
-        _deliveryObject = null;
+        GrabEnded?.Invoke(_deliveryPackage);
+        Destroy(_deliveryPackage.gameObject);
+        _deliveryPackage = null;
     }
     
     private IEnumerator Throw()
     {
         _deliveryState = DeliveryState.Throwing;
         
-        _deliveryObject = _deliveryObjectFactory.Create();
+        _deliveryPackage = _deliveryObjectFactory.Create();
         
-        _deliveryObject.transform.position = _transform.position;
+        _deliveryPackage.transform.position = _transform.position;
         
-        yield return MoveParabolic(_deliveryObject.transform, _deliveryRecipient.transform);
+        yield return MoveParabolic(_deliveryPackage.transform, _deliveryRecipient.transform);
         
         _deliveryState = DeliveryState.Waiting;
         
-        ThrowEnded?.Invoke(_deliveryObject);
+        ThrowEnded?.Invoke(_deliveryPackage);
         
-        Destroy(_deliveryObject.gameObject);
-        _deliveryObject = null;
+        Destroy(_deliveryPackage.gameObject);
+        _deliveryPackage = null;
     }
 
     private Vector3 CalculateQuadraticBezierPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)

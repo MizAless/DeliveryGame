@@ -27,12 +27,22 @@ public static class GlobalEvents
 
 public interface IEvent { }
 
-public class DeliveryManGoingToDeliveryObjectEvent : IEvent
+public class DeliveryManGoingToDeliveryPackageEvent : IEvent
 {
-    public DeliveryObject DeliveryObject { get; set; }
+    public DeliveryPackage DeliveryPackage { get; set; }
 }
 
 public class DeliveryManGoingToDeliveryRecipientEvent : IEvent
 {
     public DeliveryRecipient DeliveryRecipient { get; set; }
+}
+
+public class DeliveryTaskCompletedEvent : IEvent
+{
+    public DeliveryTask DeliveryTask { get; set; }
+}
+
+public class DeliveryTaskCanceledEvent : IEvent
+{
+    public DeliveryTask DeliveryTask { get; set; }
 }

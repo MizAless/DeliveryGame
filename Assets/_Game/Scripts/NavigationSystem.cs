@@ -9,8 +9,8 @@
 
     public void Tick()
     {
-        if (GlobalEvents.TryGet<DeliveryManGoingToDeliveryObjectEvent>(out var deliveryManGoingToDeliveryObjectEvent))
-            _navigationArrow.SetTarget(deliveryManGoingToDeliveryObjectEvent.DeliveryObject.transform);
+        if (GlobalEvents.TryGet<DeliveryManGoingToDeliveryPackageEvent>(out var deliveryManGoingToDeliveryPackageEvent))
+            _navigationArrow.SetTarget(deliveryManGoingToDeliveryPackageEvent.DeliveryPackage.transform);
         
         if (GlobalEvents.TryGet<DeliveryManGoingToDeliveryRecipientEvent>(out var deliveryManGoingToDeliveryRecipientEvent))
             _navigationArrow.SetTarget(deliveryManGoingToDeliveryRecipientEvent.DeliveryRecipient.transform);

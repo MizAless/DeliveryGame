@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 2805235044534277052}
   - component: {fileID: 6675538122730965498}
   m_Layer: 0
-  m_Name: DeliveryObject
+  m_Name: DeliveryPackage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

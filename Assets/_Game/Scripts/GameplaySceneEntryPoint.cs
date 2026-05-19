@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Net;
+using UnityEngine;
 
 public class GameplaySceneEntryPoint : MonoBehaviour
 {
@@ -6,7 +7,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
     [SerializeField] private Updater _updater;
     [SerializeField] private Camera _camera;
     
-    [SerializeField] private DeliveryObject _deliveryObjectPrefab;
+    [SerializeField] private DeliveryPackage deliveryPackagePrefab;
     [SerializeField] private DeliveryRecipient _deliveryRecipientPrefab;
     
     [SerializeField] private Transform _spawnPoint;
@@ -43,7 +44,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         PlayerInput moveInput = new PlayerInput(_actions);
         PlayerFactory playerFactory = new PlayerFactory(_playerPrefab);
         
-        DeliveryObjectFactory deliveryObjectFactory = new DeliveryObjectFactory(_deliveryObjectPrefab);
+        DeliveryObjectFactory deliveryObjectFactory = new DeliveryObjectFactory(deliveryPackagePrefab);
         DeliveryRecipientFactory deliveryRecipientFactory = new DeliveryRecipientFactory(_deliveryRecipientPrefab);
         
         var followCameraData = new FollowCameraData()
@@ -57,6 +58,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
 
         ServiceLocator.Register<IMoveInput>(moveInput);
         ServiceLocator.Register<IHorizontalAngleOffset>(horizontalAngleOffset);
+        ServiceLocator.Register<Updater>(_updater);
         
         var player = playerFactory.Create();
         var navigationArrow = player.GetComponentInChildren<NavigationArrow>();
@@ -72,7 +74,7 @@ public class GameplaySceneEntryPoint : MonoBehaviour
         
         DeliveryTaskBuilder deliveryTaskBuilder = new DeliveryTaskBuilder(deliveryObjectFactory, deliveryRecipientFactory, horizontalAngleOffset, deliveryMan);
         
-        DeliverySystem deliverySystem = new DeliverySystem(deliveryMan, deliveryObjectFactory, deliveryRecipientFactory, mapInterestPoints, horizontalAngleOffset, deliveryTaskBuilder);
+        DeliverySystem deliverySystem = new DeliverySystem(mapInterestPoints, deliveryTaskBuilder);
         
         mover.Init(moveInput, horizontalAngleOffset, mapBounds);
         

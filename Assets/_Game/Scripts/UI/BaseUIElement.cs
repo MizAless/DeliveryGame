@@ -11,6 +11,7 @@ public abstract class BaseUIElement : MonoBehaviour
     private RectTransform _rectTransform;
     private Vector2 _originalPosition;
     private Canvas _canvas;
+    private Direction _lastHideDirection; // Запоминаем последнее направление скрытия
     
     // Направления для анимации
     private enum Direction
@@ -39,13 +40,11 @@ public abstract class BaseUIElement : MonoBehaviour
     
     public void Show()
     {
-        // gameObject.SetActive(true);
         OnShow();
     }
     
     public void Close()
     {
-        // gameObject.SetActive(false);
         OnClose();
     }
     
@@ -66,35 +65,38 @@ public abstract class BaseUIElement : MonoBehaviour
     {
         if (_rectTransform == null) return;
         
-        // Сохраняем оригинальную позицию если нужно
-        if (_originalPosition == Vector2.zero && _rectTransform.anchoredPosition != Vector2.zero)
-        {
-            _originalPosition = _rectTransform.anchoredPosition;
-        }
-        
         bool isShow = animationType == AnimationType.Show;
-        
-        // Получаем позицию для анимации
-        Vector2 targetPosition = isShow ? _originalPosition : GetOffScreenPosition(direction);
         
         if (isShow)
         {
-            // Телепортируем за экран перед показом
-            _rectTransform.anchoredPosition = GetOffScreenPosition(direction);
+            // При показе - стартуем с позиции, соответствующей направлению входа
+            // (это может быть позиция после последнего скрытия или стандартная заэкранная)
+            Vector2 startPosition;
+            
+            // Если последнее скрытие было с тем же направлением, используем текущую позицию
+            if (_lastHideDirection == direction && !gameObject.activeSelf)
+            {
+                startPosition = _rectTransform.anchoredPosition;
+            }
+            else
+            {
+                startPosition = GetOffScreenPosition(direction);
+            }
+            
+            _rectTransform.anchoredPosition = startPosition;
+            
+            // Анимируем к оригинальной позиции
+            Tween showTween = _rectTransform.DOAnchorPos(_originalPosition, 0.5f)
+                .SetEase(Ease.OutBack, 1.2f);
         }
-        
-        // Настройки анимации
-        float duration = isShow ? 0.5f : 0.4f;
-        Ease ease = isShow ? Ease.OutBack : Ease.InBack;
-        
-        // Запускаем анимацию
-        Tween tween = _rectTransform.DOAnchorPos(targetPosition, duration)
-            .SetEase(ease, 1.2f);
-        
-        // Если это анимация скрытия - деактивируем объект по завершению
-        if (!isShow)
+        else
         {
-            tween.OnComplete(() => gameObject.SetActive(false));
+            // При скрытии - запоминаем направление и анимируем за экран
+            _lastHideDirection = direction;
+            Vector2 targetPosition = GetOffScreenPosition(direction);
+            
+            Tween hideTween = _rectTransform.DOAnchorPos(targetPosition, 0.4f)
+                .SetEase(Ease.InBack, 1.2f);
         }
     }
     
@@ -153,6 +155,15 @@ public abstract class BaseUIElement : MonoBehaviour
         
         RectTransform canvasRect = _canvas.GetComponent<RectTransform>();
         return canvasRect != null ? canvasRect.rect.height : Screen.height;
+    }
+    
+    // Опционально: метод для принудительного сброса позиции
+    public void ResetPosition()
+    {
+        if (_rectTransform != null)
+        {
+            _rectTransform.anchoredPosition = _originalPosition;
+        }
     }
     
     protected virtual void OnDestroy()

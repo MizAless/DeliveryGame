@@ -1,4 +1,4 @@
-﻿public class DeliveryObjectFactory : AbstractFactory<DeliveryObject>
+﻿public class DeliveryObjectFactory : AbstractFactory<DeliveryPackage>
 {
-    public DeliveryObjectFactory(DeliveryObject prefab) : base(prefab) { }
+    public DeliveryObjectFactory(DeliveryPackage prefab) : base(prefab) { }
 }

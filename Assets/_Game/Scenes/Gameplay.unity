@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _taskOfferView: {fileID: 992097552}
+  _activeTaskView: {fileID: 1507738267}
 --- !u!4 &3968282
 Transform:
   m_ObjectHideFlags: 0
@@ -301,7 +302,7 @@ MonoBehaviour:
   _playerPrefab: {fileID: 3435850406439233518, guid: bbf3c80a564acb443bf8adc567c509ab, type: 3}
   _updater: {fileID: 1534275555}
   _camera: {fileID: 913011228}
-  _deliveryObjectPrefab: {fileID: 6675538122730965498, guid: 82e959b151fc2ce4e90ec2cbdc507036, type: 3}
+  deliveryPackagePrefab: {fileID: 6675538122730965498, guid: 82e959b151fc2ce4e90ec2cbdc507036, type: 3}
   _deliveryRecipientPrefab: {fileID: 8335974677461396914, guid: 658f350e832a2e746ba2b374d41275bf, type: 3}
   _spawnPoint: {fileID: 1747620375}
   _spawnDistance: 5
@@ -337,7 +338,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &287964289
 RectTransform:
   m_ObjectHideFlags: 0
@@ -953,6 +954,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1507738267 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4032267205995450339, guid: 785246f010588a24fba6d4b27460722a, type: 3}
+  m_PrefabInstance: {fileID: 1331400400300849536}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab3d8b1f5fa4ff7857d8d602b2b6d59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1534275554
 GameObject:
   m_ObjectHideFlags: 0

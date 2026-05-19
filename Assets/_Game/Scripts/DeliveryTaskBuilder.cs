@@ -33,19 +33,22 @@ public class DeliveryTaskBuilder
         _currentDeliveryRecipient.transform.position = deliveryTask.RecipientModel.SpawnPosition;
         _deliveryMan.ThrowEnded += OnThrowEnded;
     }
-    
-    private void OnGrabEnded(DeliveryObject obj)
+
+    private void OnGrabEnded(DeliveryPackage obj)
     {
         _deliveryMan.GrabEnded -= OnGrabEnded;
         
         _deliveryMan.SetTarget(_currentDeliveryRecipient);
     }
 
-    private void OnThrowEnded(DeliveryObject obj)
+    private void OnThrowEnded(DeliveryPackage obj)
     {
         _deliveryMan.ThrowEnded -= OnThrowEnded;
         
         Object.Destroy(_currentDeliveryRecipient.gameObject);
         _currentDeliveryRecipient = null;
+
+        _currentTask.Complete();
+        _currentTask = null;
     }
 }
